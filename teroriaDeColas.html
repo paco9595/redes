@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>teoria de Colas</title>
+    <link rel="stylesheet" href="dist/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="dist/fontawesome-all.min.css">
+    <script type="text/javascript" src="dist/vis.js"></script>
+    <link rel="stylesheet" href="vis-network.css">
+    <style type="text/css">
+        .title {
+            margin-top: 20px;
+            width: 100vw;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="title">
+        <h1>Teoria de colas</h1>
+    </div>
+    <div class="container todo">
+        <div class="form-group col-6">
+            <div class="row">
+                <label class="col-12">Capacidad de la red</label>
+            </div>
+            <form class="row">
+                <div class="col-10">
+                    <div class="row">
+                        <input type="text" class="form-control col-12" id="capacidad" required="required" placeholder="Capacidad">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="form-group col-6">
+            <div class="row">
+                <label class="col-12">Cuantas terminales hay</label>
+            </div>
+            <form class="row">
+                <div class="col-10">
+                    <div class="row">
+                        <input type="text" class="form-control col-12" id="terminales" required="required" placeholder="terminales">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="form-group col-6">
+            <div class="row">
+                <label class="col-12">Frecuencia de salida de los mensajes por minuto</label>
+            </div>
+            <form class="row">
+                <div class="col-10">
+                    <div class="row">
+                        <input type="text" class="form-control col-12" id="frecuencia" required="required" placeholder="frecuencia">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="form-group col-6">
+            <div class="row">
+                <label class="col-12">Promedio de mensajes</label>
+            </div>
+            <form class="row">
+                <div class="col-10">
+                    <div class="row">
+                        <input type="text" class="form-control col-12" id="promedio" required="required" placeholder="promedio">
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="row">
+            <div class="btn-node col-1">
+                <button type="submit" class="btn btn-primary" id="variables" onclick="getVariables()">Agregar</button>
+            </div>
+        </div>
+        <div class="row">
+            <h2>Resultados</h2>
+        </div>
+        <div class="row">
+            <div class="col-6 " id="En">Tiempo de ocupación promedio del bufer E(n) =
+            </div>
+        </div>
+        <div class="row" id="Et">
+            <div class="col-12 " id="Et">Tiempo promedio de retraso E(T) = </div>
+        </div>
+    </div>
+    <script src="dist/jquery.js"></script>
+    <script src="dist/bootstrap/js/bootstrap.min.js"></script>
+    <script src="teoriaDeColas.js"></script>
+
+</body>
+
+</html>
