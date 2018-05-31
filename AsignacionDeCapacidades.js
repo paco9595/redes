@@ -1,4 +1,4 @@
-var shadowState, nodesArray, nodes, edgesArray, edges, network;
+var shadowState, nodesArray, nodes, edgesArray, edges, network,rutas;
 function startNetwork() {
     // this list is kept to remove a random node.. we do not add node 1 here because it's used for changes
     if (localStorage.getItem("nodesArray")) {
@@ -28,7 +28,26 @@ function startNetwork() {
         ];
         localStorage.setItem('edgesArray', JSON.stringify(edgesArray))
     }
-
+    if(localStorage.getItem('matrizEnlace')){
+        MatrizEnlace = JSON.parse(localStorage.getItem('matrizEnlace'))
+    } else{
+        var matrizEnlace = [
+            ['',9.34,.935,2.94,.610],
+            [9.34,'',.82,2.4,628],
+            [.935,.82,'',.608,.131],
+            [2.92,2.4,.608,'',.753],
+            [.610,.628,.131,.753,'']
+        ];
+        localStorage.setItem('matrizEnlace',JSON.stringify(matrizEnlace));
+    }
+    if(localStorage.getItem('rutas')){
+        rutas = JSON.parse(localStorage.getItem('rutas'))
+    }else{
+        var rutas = [
+            [3,0,2],
+            [3,1,4]
+        ]
+    }
     // create an array with edges
     edges = new vis.DataSet(edgesArray);
 
@@ -40,8 +59,13 @@ function startNetwork() {
     };
     var options = {};
     network = new vis.Network(container, data, options);
+    generarMatriz() 
     listaNodos();
     listaEdges();
+    MatrizDeEnlace(); 
+    
+    buscarCamino(3,0,4); 
+
 }
 function addNode() {
     var lsNode = JSON.parse(localStorage.getItem("nodesArray"));
@@ -94,6 +118,83 @@ function listaEdges() {
         $('#cantainerEdges li#' + (i + 1) + ' i.icon').attr('onclick', 'removeEdge(' + i + ')');
     }
 }
+function MatrizDeEnlace() {
+    var lsNode = JSON.parse(localStorage.getItem("nodesArray"));
+    var lsEnlaces = JSON.parse(localStorage.getItem('matrizEnlace'));
+    lsNode.forEach(obj => {
+        $('<th/>', {
+            id: "titulosCiudades" + obj.id,
+            text: obj.label
+        }).appendTo('#titulosCiudades')
+    })
+    for(var i =0;i<lsNode.length;i++){
+        $('<tr/>', {
+            id: 'enlace' + (i + 1)
+
+        }).appendTo('#containerCuidades')
+        $('<td/>', {
+            text: (i+1) + "- " + lsNode[i].label 
+        }).appendTo("#enlace" + (i + 1))
+        for(var j =0;j<lsNode.length;j++){
+            if (j == i){
+                $('<td/>', {
+                    text: '0'
+                }).appendTo("#enlace" + (i + 1))
+            } else{
+                    $('<td/>', {
+                        html: '<input type="text" value="'+ lsEnlaces[i][j] +'" name="" id="'+i+'-'+j+'">'
+                    }).appendTo("#enlace" + (i + 1))
+            }
+
+        }
+    }
+}
+function buscarCamino(inicio,fin,obli){
+    var lsNode = JSON.parse(localStorage.getItem("nodesArray"));
+    var lsEdges = JSON.parse(localStorage.getItem('edgesArray'));
+    var lsMatriz = JSON.parse(localStorage.getItem('matrizEnlaces'));
+    pos = new Number(inicio)
+    var visitados= [inicio]
+    while (pos!= fin) {
+        const nodo = lsMatriz[pos]
+        const posible = nodo.filter(elemento => elemento > 0);
+        for (let i = 0; i < posible.length; i++) {
+            posible[i] == lsMatriz[pos][nodo.indexOf(posible[i])]
+        }
+        for (let i = 0; i < posible.length; i++) {
+            if (nodo.indexOf(posible[i]) != obli && visitados.indexOf(obli) == -1){
+                pos = obli;
+                visitados.push(obli)
+            }else if (nodo.indexOf(posible[i]) == fin){
+                pos = fin
+                visitados.push(fin)
+            }else if(encontrarMenor(nodo,posible[i]) && visitados.indexOf(posible[i]) == -1){
+                pos = nodo.indexOf(posible[i])
+                visitados.push(pos)
+            }
+        }
+    }
+    console.log(visitados)
+
+}
+function encontrarMenor(array,menor) {
+    for (let i = 0; i < array.length; i++) {
+        if(array[i] < menor) {
+            return false
+        }   
+    }
+    return true
+}
+
+function buscarObjeto(a, id) {
+    r = []
+    for (var i = 0; i < a.length; i++) {
+        if (a[i].from == id || a[i].to == id) {
+            r.push(a[i])
+        }
+    }
+    return r
+}
 function removeNode(id) {
     var lsNode = JSON.parse(localStorage.getItem("nodesArray"));
     lsNode.splice(id, 1);
@@ -102,7 +203,6 @@ function removeNode(id) {
     location.reload();
 }
 function removeEdge(id) {
-    console.log('hola')
     var lsEdges = JSON.parse(localStorage.getItem("edgesArray"));
     lsEdges.splice(id,1);
     localStorage.setItem('edgesArray', JSON.stringify(lsEdges))
@@ -131,4 +231,29 @@ function findObjectByKey(array, key, value) {
     }
     return null;
 }
+function generarMatriz(){
+    var lsNode = JSON.parse(localStorage.getItem("nodesArray"));
+    var lsEdges = JSON.parse(localStorage.getItem('edgesArray'));
+    var aux = []
+    var matriz = []
+    for (let i = 0; i < lsNode.length; i++) {
+        for (let j = 0; j < lsNode.length; j++) {
+            aux.push(0)
+        }
+        matriz.push(aux)
+        aux = []
+    }
+    for (let i = 0; i < lsNode.length; i++) {
+        var objs = buscarObjeto(lsEdges,lsNode[i].id)
+        console.log(objs)
+        for (let j = 0; j < objs.length; j++) {
+            console.log(objs[j])
+            matriz[objs[j].from - 1][objs[j].to - 1] = parseFloat(objs[j].label)
+            matriz[objs[j].to - 1][objs[j].from - 1] = parseFloat(objs[j].label)
+            matriz[0][0] = 0
+        }
+    }
+    localStorage.setItem('matrizEnlaces',JSON.stringify(matriz));
+}
+
 startNetwork();

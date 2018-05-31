@@ -64,7 +64,7 @@
     <div class="title">
         <h1>Asignacion de Capacidades</h1>
     </div>
-    <div class="container-fluid todo">
+    <div class="container todo">
         <div class="row">
             <div class="net col-6">
                 <div id="mynetwork" class=""></div>
@@ -108,11 +108,71 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="row">
+                    <h2>Rutas</h2>
+                </div>
+                <div class="row">
+                    <input type="text" class="form-control col-2" id="rutainicio" placeholder="nodo Inicio">
+                    <input type="text" class="form-control col-2" id="rutafin" placeholder="nodo fin">
+                    <input type="text" class="form-control col-2" id="rutaobli" placeholder="nodo obli">
+                    <button type="submit" class="btn-add btn btn-primary col-3" onclick="addNode()">Agregar</button>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <table class="table">
+                            <thead>
+                                <tr id="titulosrutas">
+                                    <th>inicio</th>
+                                    <th>fin</th>
+                                    <th>obligatorio</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="containerRutas">
+                                <tr>
+                                    <td>los Angeles</td>
+                                    <td>New york</td>
+                                    <td>houston</td>
+                                    <th></th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div><br><br><br>
+        <div class="row">
+            <div class="col-6">
+                <div class="row">
+                    <div class="col-6">
+                        <h2>Matriz de enlaces</h2>
+                    </div>
+                    <div class="col-6">
+                        <button type="submit" class="btn btn-primary" id="nuevoEdge" onclick="ActualizarMatriz()">Actualizar</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <table class="table">
+                            <thead>
+                                <tr id="titulosCiudades">
+                                    <th>Ciudades</th>
+                                </tr>
+                            </thead>
+                            <tbody id="containerCuidades">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="dist/jquery.js"></script>
     <script src="dist/bootstrap/js/bootstrap.min.js"></script>
     <script src="AsignacionDeCapacidades.js"></script>
-
+        
 </body>
 
 </html>
