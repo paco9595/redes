@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Asignacion de Capacidades</title>
+    <link rel="stylesheet" href="dist/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="dist/fontawesome-all.min.css">
+    <script type="text/javascript" src="dist/vis.js"></script>
+    <link rel="stylesheet" href="vis-network.css">
+    <style type="text/css">
+        .title {
+            margin-top: 20px;
+            width: 100vw;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+        }
+
+        .todo {
+            margin-top: 20px;
+        }
+
+        #mynetwork {
+            width: 600px;
+            height: 400px;
+            border: 1px solid lightgray;
+        }
+
+        .net {
+            display: flex;
+            justify-content: center;
+        }
+
+        .input-objet {
+            display: flex;
+            align-items: center
+        }
+
+        .btn-node {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .btn-add {
+            margin-left: 5px;
+        }
+
+        .icon {
+            float: right;
+        }
+
+        .arrow {
+            margin: 0 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="title">
+        <h1>Asignacion de Capacidades</h1>
+    </div>
+    <div class="container todo">
+        <div class="row">
+            <div class="net col-6">
+                <div id="mynetwork" class=""></div>
+            </div>
+            <div class="col-6 data">
+                <div class="row">
+                    <div class="col-12">
+                        <h2>longuitud promedio del mensaje</h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row">
+                            <input type="text" class="form-control col-6" id="longuitudPromedio" required="required" placeholder="longuitud Promedio" value="120">
+                            <button type="submit" class="btn-add btn btn-primary col-3" onclick="addNode()">Actualizar</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row input-objet">
+                    <div class="form-group col-5">
+                        <div class="row">
+                            <label class="col-12">Nuevo Nodo</label>
+                        </div>
+                        <div class="row">
+                            <input type="text" class="form-control col-8" id="nuevoNodo" placeholder="Nombre del Nodo">
+                            <button type="submit" class="btn-add btn btn-primary col-3" onclick="addNode()">Agregar</button>
+                        </div>
+                    </div>
+                    <div class="form-group col-6">
+                        <div class="row">
+                            <label class="col-12">Nueva Conexion</label>
+                        </div>
+                        <form class="row">
+                            <div class="col-10">
+                                <div class="row">
+                                    <input type="text" class="form-control col-6" id="nodoInicial" required="required" placeholder="nodo Inicial">
+                                    <input type="text" class="form-control col-6" id="nodoFinal" required="required" placeholder="nodo Final">
+                                    <input type="text" class="form-control col-6" id="lamda" required="required" placeholder="lamda">
+                                    <input type="text" class="form-control col-6" id="distancia" required="required" placeholder="distancia">
+                                </div>
+                            </div>
+                            <div class="btn-node col-1">
+                                <button type="submit" class="btn btn-primary" id="nuevoEdge" onclick="addEgde()">Agregar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5">
+                        <ul class="list-group list-group-flush" id="cantainerNodes"></ul>
+                    </div>
+                    <div class="col-5">
+                        <ul class="list-group list-group-flush" id="cantainerEdges"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-6">
+                        <h2>
+                            Tabla de tarifas
+                        </h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="row">
+                            <input type="text" class="form-control col-4" id="Capacidad" placeholder="Capacidad">
+                            <input type="text" class="form-control col-4" id="valCosto" placeholder="Costo">
+                            <button type="submit" class="btn-add btn btn-primary col-3" onclick="addCapacidad()">Agregar</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Capacidad</th>
+                                    <th>Costo</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="containerCapacidades">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-6">
+                        <h2>Info De Enlace</h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID Enlace</th>
+                                    <th>lamda</th>
+                                    <th>distancia</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contentInfo">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+                <div class="col-12">
+                        <div class="row">
+                            <div class="col-6">
+                                <h2>Tabla de retraso</h2>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <table class="table">
+                                    <thead>
+                                        <tr id="titulostablaretraso">
+                                            <th>ID Enlace</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="contenRetraso">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+        </div>
+    </div>
+
+    <script src="dist/jquery.js"></script>
+    <script src="dist/bootstrap/js/bootstrap.min.js"></script>
+    <script src="redesCentralizadas.js"></script>
+
+</body>
+
+</html>
