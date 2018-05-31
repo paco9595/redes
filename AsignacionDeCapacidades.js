@@ -1,4 +1,4 @@
-var shadowState, nodesArray, nodes, edgesArray, edges, network,rutas;
+    var shadowState, nodesArray, nodes, edgesArray, edges, network,rutas;
 function startNetwork() {
     // this list is kept to remove a random node.. we do not add node 1 here because it's used for changes
     if (localStorage.getItem("nodesArray")) {
@@ -18,13 +18,13 @@ function startNetwork() {
         edgesArray = JSON.parse(localStorage.getItem("edgesArray"));
     } else {
         var edgesArray = [
-            { from: 1, to: 2, label: '9.95' },
-            { from: 1, to: 3, label: '3.88' },
-            { from: 2, to: 3, label: '0.82' },
-            { from: 2, to: 5, label: '3.64' },
-            { from: 3, to: 5, label: '0.13' },
-            { from: 3, to: 4, label: '3.55' },
-            { from: 4, to: 5, label: '3.15' }
+            { from: 4, to: 5, label: '9.95' },
+            { from: 4, to: 3, label: '3.88' },
+            { from: 5, to: 3, label: '0.82' },
+            { from: 5, to: 2, label: '3.64' },
+            { from: 2, to: 3, label: '0.13' },
+            { from: 3, to: 1, label: '3.55' },
+            { from: 2, to: 1, label: '3.15' }
         ];
         localStorage.setItem('edgesArray', JSON.stringify(edgesArray))
     }
@@ -44,9 +44,10 @@ function startNetwork() {
         rutas = JSON.parse(localStorage.getItem('rutas'))
     }else{
         var rutas = [
-            [3,0,2],
-            [3,1,4]
+            [3,1,2],
+            [3,0,4]
         ]
+        localStorage.setItem('rutas',JSON.stringify(rutas))
     }
     // create an array with edges
     edges = new vis.DataSet(edgesArray);
@@ -63,18 +64,26 @@ function startNetwork() {
     listaNodos();
     listaEdges();
     MatrizDeEnlace(); 
-    
-    buscarCamino(3,0,4); 
+    tablaRutas()    
+    buscarCamino(3,0,1); 
 
 }
 function addNode() {
     var lsNode = JSON.parse(localStorage.getItem("nodesArray"));
+    var lsMatriz = JSON.parse(localStorage.getItem('matrizEnlace'))
     var label = $('#nuevoNodo').val();
     var id = lsNode.length + 1;
     var obj = { id, label }
     nodes.add(obj);
     lsNode.push(obj);
+    aux = []
+    for (let i = 0; i < lsMatriz.length; i++) {
+        lsMatriz[i].push(0)
+        aux.push(0)
+    }
+    lsMatriz.push(aux)
     localStorage.setItem('nodesArray', JSON.stringify(lsNode));
+    localStorage.setItem('matrizEnlace',JSON.stringify(lsMatriz))
     location.reload()
 }
 function addEgde() {
@@ -86,6 +95,12 @@ function addEgde() {
     lsedges.push(obj);
     localStorage.setItem('edgesArray', JSON.stringify(lsedges));
     location.reload();
+}
+function removeRuta(id){
+    var lsrutas = JSON.parse(localStorage.getItem('rutas'))
+    lsrutas.splice(id, 1);
+    localStorage.setItem('rutas',JSON.stringify(lsrutas));
+    location.reload()
 }
 function listaNodos() {
     var lsNode = JSON.parse(localStorage.getItem("nodesArray"));
@@ -117,6 +132,58 @@ function listaEdges() {
         }).appendTo('#cantainerEdges li#' + (i + 1))
         $('#cantainerEdges li#' + (i + 1) + ' i.icon').attr('onclick', 'removeEdge(' + i + ')');
     }
+}
+function tablaRutas() {
+    var lsrutas = JSON.parse(localStorage.getItem('rutas'))
+    var lsnodes = JSON.parse(localStorage.getItem("nodesArray"));
+    for (let i = 0; i < lsrutas.length; i++) {
+        console.log(i)
+        $('<tr/>', {
+            id: "rutas" + i,
+        }).appendTo('#containerRutas')
+        $('<td/>',{
+            id:'rutainicio' + i,
+            text: lsnodes[lsrutas[i][0]].label
+        }).appendTo('#rutas'+i)
+        $('<td/>',{
+            id:'rutaFin' + i,
+            text: lsnodes[lsrutas[i][1]].label
+        }).appendTo('#rutas'+i)
+        $('<td/>',{
+            id:'rutaObli' + i,
+            text: lsnodes[lsrutas[i][2]].label
+        }).appendTo('#rutas'+i)
+        $('<td/>',{
+            id:'rutaclose' + i,
+            html: '<i class="fas fa-times icon"></i>'
+        }).appendTo('#rutas'+i)
+        $('#containerRutas tr#rutas'+i+' td#rutaclose' + i + ' i').attr('onclick', 'removeRuta(' + i + ')');
+    }
+}
+function addRuta() {
+    var lsrutas = JSON.parse(localStorage.getItem('rutas'));
+    var inicio = parseInt($('#rutainicio').val());
+    var fin = parseInt($('#rutafin').val());
+    var obli = parseInt($('#rutaobli').val());
+    a = [inicio,fin,obli]
+    lsrutas.push(a)
+    localStorage.setItem('rutas',JSON.stringify(lsrutas))
+    location.reload()
+}
+function ActualizarMatriz() {
+    var lsMatriz = JSON.parse(localStorage.getItem('matrizEnlace'))
+    for (let i = 0; i < lsMatriz.length; i++) {
+        for (let j = 0; j < lsMatriz[i].length; j++) {
+            if (j!=i){
+                var val = parseFloat($('input#'+i+'-'+  j).val());
+                lsMatriz[i][j] = val;
+            }
+            
+        }
+        
+    }
+    localStorage.setItem('matrizEnlace',JSON.stringify(lsMatriz));
+    location.reload()
 }
 function MatrizDeEnlace() {
     var lsNode = JSON.parse(localStorage.getItem("nodesArray"));
@@ -253,6 +320,7 @@ function generarMatriz(){
             matriz[0][0] = 0
         }
     }
+    console.log(matriz)
     localStorage.setItem('matrizEnlaces',JSON.stringify(matriz));
 }
 
