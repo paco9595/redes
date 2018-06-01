@@ -45,41 +45,14 @@ function startNetwork() {
     if (localStorage.getItem("edgesArray")) {
         edgesArray = JSON.parse(localStorage.getItem("edgesArray"));
     } else {
-        var edgesArray = [{
-                from: 2,
-                to: 1,
-                label: '1'
-            },
-            {
-                from: 1000,
-                to: 2,
-                label: '2'
-            },
-            {
-                from: 1000,
-                to: 3,
-                label: '3'
-            },
-            {
-                from: 7,
-                to: 4,
-                label: '4'
-            },
-            {
-                from: 7,
-                to: 5,
-                label: '5'
-            },
-            {
-                from: 1000,
-                to: 6,
-                label: '6'
-            },
-            {
-                from: 3,
-                to: 7,
-                label: '7'
-            }
+        var edgesArray = [
+            {from: 2, to: 1, label: '1'},
+            {from: 1000, to: 2, label: '2'},
+            {from: 1000,to: 3,label: '3'},
+            {from: 7,to: 4,label: '4'},
+            {from: 7,to: 5,label: '5'},
+            {from: 1000,to: 6,label: '6'},
+            {from: 3,to: 7,label: '7'}
         ];
         localStorage.setItem('edgesArray', JSON.stringify(edgesArray))
     }
@@ -140,8 +113,123 @@ function startNetwork() {
     tablaDeRetraso();
     generarRutas(1000, [],1000);
     console.log(rutas)
+    var resultados = sacarRutas(rutas)
+    var retrasosReducidos = sumarTabla(resultados);
+    tablaDeRetrasoReducido(retrasosReducidos    )
 }
+function tablaDeRetrasoReducido(r) {
+    var lsEdges = JSON.parse(localStorage.getItem("edgesArray"));
+    var lslamda = JSON.parse(localStorage.getItem('lamda'));
+    var lsdist = JSON.parse(localStorage.getItem('distancias'));
+    var lsCapacidades = JSON.parse(localStorage.getItem('capacidades'));
+    var long = parseInt($('#longuitudPromedio').val())
+    localStorage.setItem('long',JSON.stringify(long));
+    lsCapacidades.forEach(obj => {
+        $('<th/>', {
+            id: "CapacidadesCtitulo" + obj.id,
+            text: obj.cap
+        }).appendTo('#titulostablaretrasoReducida')
+    })
+    for (var i = 0; i < r[0].length; i++) {
+        $('<tr/>', {
+            id: 'enlaceReducido' + (i + 1)
 
+        }).appendTo('#contenRetrasoreducida')
+        $('<td/>', {
+            text: i+1
+        }).appendTo("#enlaceReducido" + (i + 1))
+        $('<td/>', {
+            html: 'Delay (sec)<br> costo ($/mo)'
+        }).appendTo("#enlaceReducido" + (i + 1))
+        for (var j = 0; j < lsCapacidades.length; j++) {
+            $('<td/>', {
+                html: r[0][i][j].toFixed(4) + '<br>' + r[1][i][j]
+            }).appendTo("#enlaceReducido" + (i + 1))
+        }
+    }
+
+}
+function sumarTabla(resultados){
+    var aux = []
+    var tiempos =[]
+    var costos = []
+    resultados.splice(2,1)
+    for (let i = 0; i < resultados.length; i++) {
+        for (let j = 0; j < resultados[i].length; j++) {
+            if (j ==0) {
+                tiempos.push(sumar(resultados[i][j]))
+            }else{
+                costos.push(sumar(resultados[i][j]))
+            }
+            
+        }
+        
+    }
+    return [tiempos,costos]
+}
+function sumar(resultados){
+    console.log(resultados)
+    var suma = 0
+    var res = []
+    for (let i = 0; i < resultados[0].length; i++) {
+        for (let j = 0; j < resultados.length; j++) {
+            console.log(resultados[j][i])
+            suma += parseFloat(resultados[j][i])
+        }
+        res.push(suma)
+        suma = 0
+    }
+    return res
+}
+function sacarRutas(datos) {
+    let lsEdges = JSON.parse(localStorage.getItem("edgesArray"));
+    let lsCapacidades = JSON.parse(localStorage.getItem('capacidades'));
+    let lslamda = JSON.parse(localStorage.getItem('lamda'));
+    let long = JSON.parse(localStorage.getItem('long'))
+    let lsdist = JSON.parse(localStorage.getItem('distancias'));
+    let tiempo = []
+    let auxTiempo=[]
+    let costo =[]
+    let auxCosto=[]
+    let resultados = []
+    for (let i = 0; i < datos.length; i++) {
+        if (datos[i][0].id != 1000){
+            datos[i].unshift({id: 1000,label: 'Origen'})
+        }
+        
+    }
+    console.log('add',datos)
+    for (let i = 0; i < datos.length; i++) {
+        for (let j = 0; j < datos[i].length -1; j++) {
+            console.log('edge 1', lsEdges,datos[i][j],datos[i][j+1])
+            var edge = findEdge(lsEdges,datos[i][j].id,datos[i][j+1].id)
+            console.log('new edge',edge)
+            if(edge == 0){
+                for (let y = j-1; y > 0; y--) {
+                    console.log('edge 1', lsEdges,datos[i][j],datos[i][j+1],datos[i][y],i,j,y)
+                    var edge = findEdge(lsEdges,datos[i][y].id,datos[i][j + 1].id)
+                    if (edge != 0) {
+                        break;
+                    }
+                }
+            }
+            for (let k = 0; k < lsCapacidades.length; k++) {
+                auxTiempo.push(sacarTiempoRetraso(lslamda[parseInt(edge.label)-1],lsCapacidades[k].cap,long))
+                auxCosto.push(sacarCostoMensual(lsCapacidades[k].costo, lsdist[parseInt(edge.label)-1]))
+            }
+            tiempo.push(auxTiempo)
+            costo.push(auxCosto)
+            auxCosto = []
+            auxTiempo = []
+            
+        }
+        resultados.push([tiempo,costo])
+        tiempo = []
+        costo = []
+    }
+    return resultados;
+    
+}
 function addNode() {
     var lsNode = JSON.parse(localStorage.getItem("nodesArray"));
     var label = $('#nuevoNodo').val();
@@ -285,6 +373,7 @@ function tablaDeRetraso() {
     var lsdist = JSON.parse(localStorage.getItem('distancias'));
     var lsCapacidades = JSON.parse(localStorage.getItem('capacidades'));
     var long = parseInt($('#longuitudPromedio').val())
+    localStorage.setItem('long',JSON.stringify(long));
     lsCapacidades.forEach(obj => {
         $('<th/>', {
             id: "CapacidadesCtitulo" + obj.id,
@@ -304,7 +393,7 @@ function tablaDeRetraso() {
         }).appendTo("#enlace" + (i + 1))
         for (var j = 0; j < lsCapacidades.length; j++) {
             $('<td/>', {
-                html: sacarTiempoRetraso(lslamda[j], lsCapacidades[j].cap, long) + '<br>' + sacarCostoMensual(lsCapacidades[j].costo, lsdist[i])
+                html: sacarTiempoRetraso(lslamda[i], lsCapacidades[j].cap, long) + '<br>' + sacarCostoMensual(lsCapacidades[j].costo, lsdist[i])
             }).appendTo("#enlace" + (i + 1))
         }
     }
@@ -369,7 +458,6 @@ function generarRutas(id, camino, Origen) {
     if (b.length > 0) {
         var rutaIncompleta = camino;
         for (let i = 0; i < b.length; i++) {
-            console.log(rutaIncompleta, camino)
             if (i != 0 && id != Origen && camino.length == 0) {
                 console.log('rutas', rutaIncompleta)
                 console.log('caminon', camino)
@@ -382,6 +470,7 @@ function generarRutas(id, camino, Origen) {
         rutas.push(camino)
         camino = []
     }
+    console.log('rutas',rutas)
     return camino
 }
 
@@ -402,5 +491,13 @@ function findObjectByKey(array, key, value) {
         }
     }
     return null;
+}
+function findEdge(array,value1,value2) {
+    for (var i = 0; i < array.length; i++) {
+        if (array[i]['from'] === value1 && array[i]['to'] === value2) {
+            return array[i];
+        }
+    }
+    return 0;
 }
 startNetwork();
