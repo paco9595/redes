@@ -18,10 +18,10 @@ function startNetwork() {
         edgesArray = JSON.parse(localStorage.getItem("edgesArray"));
     } else {
         var edgesArray = [
+            { from: 5, to: 2, label: '3.64' },
             { from: 4, to: 5, label: '9.95' },
             { from: 4, to: 3, label: '3.88' },
             { from: 5, to: 3, label: '0.82' },
-            { from: 5, to: 2, label: '3.64' },
             { from: 2, to: 3, label: '0.13' },
             { from: 3, to: 1, label: '3.55' },
             { from: 2, to: 1, label: '3.15' }
@@ -29,7 +29,7 @@ function startNetwork() {
         localStorage.setItem('edgesArray', JSON.stringify(edgesArray))
     }
     if(localStorage.getItem('matrizEnlace')){
-        MatrizEnlace = JSON.parse(localStorage.getItem('matrizEnlace'))
+       var MatrizEnlace = JSON.parse(localStorage.getItem('matrizEnlace'))
     } else{
         var matrizEnlace = [
             ['',9.34,.935,2.94,.610],
@@ -44,8 +44,9 @@ function startNetwork() {
         rutas = JSON.parse(localStorage.getItem('rutas'))
     }else{
         var rutas = [
-            [3,1,2],
-            [3,0,4]
+            [3,0,2],
+            [3,1,4],
+            [4,0,1]
         ]
         localStorage.setItem('rutas',JSON.stringify(rutas))
     }
@@ -60,12 +61,28 @@ function startNetwork() {
     };
     var options = {};
     network = new vis.Network(container, data, options);
+    console.log(edges)
+    console.log(MatrizEnlace)
     generarMatriz() 
     listaNodos();
     listaEdges();
     MatrizDeEnlace(); 
-    tablaRutas()    
-    buscarCamino(3,0,1); 
+    tablaRutas();
+    sacarLamdas();
+}
+function sacarLamdas(){
+    var lsEdges = JSON.parse(localStorage.getItem("edgesArray"))
+    var lsRutas = JSON.parse(localStorage.getItem('rutas'))
+    var visitados = []
+    var lamdas = []
+    for (let i = 0; i < lsEdges.length; i++) {
+        visitados.push(0)
+    }
+    for (let i = 0; i < lsRutas.length; i++) {
+        var x = buscarCamino(lsRutas[i][0],lsRutas[i][1],lsRutas[i][2])
+        console.log(x)  
+        
+    }
 
 }
 function addNode() {
@@ -137,7 +154,6 @@ function tablaRutas() {
     var lsrutas = JSON.parse(localStorage.getItem('rutas'))
     var lsnodes = JSON.parse(localStorage.getItem("nodesArray"));
     for (let i = 0; i < lsrutas.length; i++) {
-        console.log(i)
         $('<tr/>', {
             id: "rutas" + i,
         }).appendTo('#containerRutas')
@@ -209,39 +225,44 @@ function MatrizDeEnlace() {
                 }).appendTo("#enlace" + (i + 1))
             } else{
                     $('<td/>', {
-                        html: '<input type="text" value="'+ lsEnlaces[i][j] +'" name="" id="'+i+'-'+j+'">'
+                        html: '<input class="celdas" type="text" value="'+ lsEnlaces[i][j] +'" name="" id="'+i+'-'+j+'">'
                     }).appendTo("#enlace" + (i + 1))
             }
 
         }
     }
 }
-function buscarCamino(inicio,fin,obli){
+function buscarCamino(inicial,fin,obli){
     var lsNode = JSON.parse(localStorage.getItem("nodesArray"));
     var lsEdges = JSON.parse(localStorage.getItem('edgesArray'));
     var lsMatriz = JSON.parse(localStorage.getItem('matrizEnlaces'));
-    pos = new Number(inicio)
-    var visitados= [inicio]
-    while (pos!= fin) {
-        const nodo = lsMatriz[pos]
+    var visitados = [inicial]
+    while (inicial!= fin) {
+        const nodo = lsMatriz[inicial]
         const posible = nodo.filter(elemento => elemento > 0);
         for (let i = 0; i < posible.length; i++) {
-            posible[i] == lsMatriz[pos][nodo.indexOf(posible[i])]
+            posible[i] = lsMatriz[inicial][nodo.indexOf(posible[i])]
         }
+
         for (let i = 0; i < posible.length; i++) {
-            if (nodo.indexOf(posible[i]) != obli && visitados.indexOf(obli) == -1){
-                pos = obli;
+            if ( nodo.indexOf(posible[i]) == obli && visitados.indexOf(obli) == -1){
+                inicial = new Number(obli);
                 visitados.push(obli)
+                break
             }else if (nodo.indexOf(posible[i]) == fin){
-                pos = fin
+                inicial = new Number(fin)
                 visitados.push(fin)
-            }else if(encontrarMenor(nodo,posible[i]) && visitados.indexOf(posible[i]) == -1){
-                pos = nodo.indexOf(posible[i])
-                visitados.push(pos)
+                return visitados
             }
         }
+        for (let i = 0; i < posible.length; i++) {
+           if(encontrarMenor(nodo,posible[i]) && visitados.indexOf(nodo.indexOf(posible[i]))) {
+                inicial = new Number(nodo.indexOf(posible[i]))
+           }
+            
+        }
     }
-    console.log(visitados)
+    return visitados
 
 }
 function encontrarMenor(array,menor) {
