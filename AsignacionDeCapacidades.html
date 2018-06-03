@@ -20,9 +20,11 @@
             align-items: center;
 
         }
-        .celdas{
-            width: 100px;            
+
+        .celdas {
+            width: 100px;
         }
+
         .todo {
             margin-top: 20px;
         }
@@ -68,10 +70,32 @@
     </div>
     <div class="container todo">
         <div class="row">
-            <div class="net col-6 col-sm-12">
+            <div class="net col-6 ">
                 <div id="mynetwork" class=""></div>
             </div>
-            <div class="col-6 col-sm-12 data">
+            <div class="col-6 data">
+                <div class="row">
+                        <div class="form-group col-12">
+                                <div class="row">
+                                    <label class="col-12">Longitud de mensaje</label>
+                                </div>
+                                <div class="row">
+                                    <input type="text" class="form-control col-8" id="longitud" placeholder="Nombre del Nodo">
+                                    <button type="submit" class="btn-add btn btn-primary col-3" onclick="longitud()">Actualizar</button>
+                                </div>
+                            </div>
+                </div><br><br>
+                <div class="row">
+                        <div class="form-group col-12">
+                                <div class="row">
+                                    <label class="col-12">Capacidad Total</label>
+                                </div>
+                                <div class="row">
+                                    <input type="text" class="form-control col-8" id="capacidad" placeholder="Nombre del Nodo">
+                                    <button type="submit" class="btn-add btn btn-primary col-3" onclick="Capacidad()">Actualizar</button>
+                                </div>
+                            </div>
+                </div><br><br>
                 <div class="row input-objet">
                     <div class="form-group col-5">
                         <div class="row">
@@ -126,20 +150,23 @@
                         <table class="table">
                             <thead>
                                 <tr id="titulosrutas">
-                                    <th>inicio</th>
-                                    <th>fin</th>
-                                    <th>obligatorio</th>
+                                    <th>Inicio</th>
+                                    <th>A traves</th>
+                                    <th>Fin</th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody id="containerRutas">
-                               
+
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-        </div><br><br><br>
+        </div>
+        <br>
+        <br>
+        <br>
         <div class="row">
             <div class="col-6">
                 <div class="row">
@@ -163,13 +190,29 @@
                         </table>
                     </div>
                 </div>
+                <div class="row">
+                        <div class="col-12">
+                            <table class="table">
+                                <thead>
+                                    <tr id="ResultadoFinal">
+                                        <th>link</th>
+                                        <th>lamda</th>
+                                        <th>Capacidad</th>
+                                        <th>tiempo</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="containerFinal">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
             </div>
         </div>
     </div>
     <script src="dist/jquery.js"></script>
     <script src="dist/bootstrap/js/bootstrap.min.js"></script>
     <script src="AsignacionDeCapacidades.js"></script>
-        
+
 </body>
 
 </html>
